@@ -1,16 +1,17 @@
 import {type Header} from "./header.ts";
+import type {Question} from "./question.ts";
 
 export class Response {
 
     header: Header;
-    labels: string[]
+    questions: Question[]
     type: bigint
     clazz: bigint
 
 
-    constructor(header: Header, labels: string[], type: bigint, clazz: bigint) {
+    constructor(header: Header, questions: Question[], type: bigint, clazz: bigint) {
         this.header = header;
-        this.labels = labels;
+        this.questions = questions;
         this.type = type;
         this.clazz = clazz;
     }
@@ -19,21 +20,10 @@ export class Response {
         let buffers: Buffer[] = []
         buffers.push(this.header.serialize())
 
-        this.labels.forEach((val, index) => {
+        for (const question of this.questions){
+            buffers.push(question.serialize())
+        }
 
-            let tempBuffer = Buffer.from(val, 'utf-8');
-            let bufferoonis = [
-                tempBuffer.length,
-                ...tempBuffer
-
-            ]
-                        if (index == this.labels.length -1 ){
-                bufferoonis.push(0x00);
-
-            }
-            let res = Buffer.from(bufferoonis)
-            buffers.push(res)
-        })
 
         buffers.push(Buffer.from([0x00, Number(this.type)]))
         buffers.push(Buffer.from([0x00, Number(this.clazz)]))
@@ -41,7 +31,7 @@ export class Response {
 
 
 
-        return lol_buffer;
+        return Buffer.concat(buffers);
     }
 
 }

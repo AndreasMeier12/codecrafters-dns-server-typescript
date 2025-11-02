@@ -1,6 +1,7 @@
 import * as dgram from "dgram";
 import {Header} from "./types/header.ts";
 import {Response} from "./types/response.ts";
+import {Question} from "./types/question.ts";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
@@ -13,7 +14,8 @@ udpSocket.on("message", (data: Buffer, remoteAddr: dgram.RemoteInfo) => {
     try {
         console.log(`Received data from ${remoteAddr.address}:${remoteAddr.port}`);
         let header: Header = new Header(1234n, 1n, 0n, false, false, false, false, 0n, 0n, 1n, 0n, 0n, 0n);
-        let response_struct = new Response(header, ["codecrafters", "io"], 1n, 1n);
+        let question = new Question(["codecrafters", "io"]);
+        let response_struct = new Response(header, [question], 1n, 1n);
         const response = response_struct.serialize();
         udpSocket.send(response, remoteAddr.port, remoteAddr.address);
     } catch (e) {
