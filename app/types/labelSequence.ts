@@ -1,4 +1,4 @@
-export class Question{
+export class LabelSequence {
     private labels: string[]
 
 
