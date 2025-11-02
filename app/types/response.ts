@@ -20,26 +20,28 @@ export class Response {
         buffers.push(this.header.serialize())
 
         this.labels.forEach((val, index) => {
-            
-            let res = Buffer.from([
-                buffers.length,
-                ...Buffer.from(val, 'utf-8')
 
-            ])
+            let tempBuffer = Buffer.from(val, 'utf-8');
+            let bufferoonis = [
+                tempBuffer.length,
+                ...tempBuffer
 
-            if (index < this.labels.length -1 ){
-                res.writeUint8(0, res.length);
+            ]
+                        if (index == this.labels.length -1 ){
+                bufferoonis.push(0x00);
 
             }
+            let res = Buffer.from(bufferoonis)
             buffers.push(res)
         })
 
+        buffers.push(Buffer.from([0x00, Number(this.type)]))
+        buffers.push(Buffer.from([0x00, Number(this.clazz)]))
 
-        let lol_buffer = Buffer.concat(buffers);
-        lol_buffer.writeUInt16BE(Number(this.type), lol_buffer.length);
-        lol_buffer.writeUInt16BE(Number(this.clazz), lol_buffer.length);
 
-        return lol_buffer
+
+
+        return lol_buffer;
     }
 
 }
