@@ -34,16 +34,16 @@ export class Header {
     public serialize(): Buffer {
 
         let buffer: any = Buffer.alloc(12);
-        buffer.writeUInt16BE(Number(1234), 0);
-        let flags = 0n;
-        flags |= this.queryResponseIndicator << 15n;
-        flags |= this.operationCode << 11n;
-        flags |= this.authoritativeAnswer ? 1n : 0n << 10n;
-        flags |= this.truncation ? 1n : 0n << 9n;
-        flags |= this.recursionDesired ? 1n : 0n << 8n;
-        flags |= this.recursionAvailable ? 1n : 0n << 7n;
-        flags |= this.reserved << 4n;
-        flags |= this.responsecode;
+        buffer.writeUInt16BE(Number(this.packetIdentifier), 0);
+        let flags = 0;
+        flags |= Number( this.queryResponseIndicator) << 15;
+        flags |= Number( this.operationCode) << 11;
+        flags |= (this.authoritativeAnswer ? 1 : 0) << 10;
+        flags |= (this.truncation ? 1 : 0) << 9;
+        flags |= (this.recursionDesired ? 1 : 0) << 8;
+        flags |= (this.recursionAvailable ? 1 : 0) << 7;
+        flags |= Number( this.reserved) << 4;
+        flags |= Number ( this.responsecode);
         buffer.writeUInt16BE(Number(flags), 2);
         buffer.writeUInt16BE(Number(this.questionCount), 4);
         buffer.writeUInt16BE(Number(this.answerRecordCount), 6)
