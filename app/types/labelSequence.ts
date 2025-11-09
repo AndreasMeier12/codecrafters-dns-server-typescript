@@ -27,25 +27,37 @@ export class LabelSequence {
 
     }
 
-    public static from(buffer: Buffer): [LabelSequence, Buffer]{
+    public static from(buffer: Buffer, offset: number): [LabelSequence, number]{
 
         let parts: string[] = []
-        let len: Number = 0;
-        let curBuffer = buffer;
-        while (curBuffer.length > 0 && curBuffer.readUint8(0) != 0){
-            let result = this.parsePart(curBuffer);
+        let pos: number = offset;
+
+        let compression = false
+        do {
+        let first = buffer.readUInt16BE(pos);
+            const  compression_offset = 0xC000;
+            let is_compression = first & compression_offset;
+            if (is_compression > 0 ) {
+                let newOffset = first & (~compression_offset)
+                let result = this.from(buffer, newOffset);
+                parts.push(...result[0].labels)
+                return [new LabelSequence(parts), pos + 2]
+
+            }
+            let result = this.parsePart(buffer, pos);
             parts.push(result[0])
-            curBuffer = result[1]
+            pos = result[1]
+                    first = buffer.readUInt16BE(pos);
+            is_compression = first & compression_offset;
+            compression = is_compression > 0;
 
-        }
-
-
-        return [new LabelSequence(parts), curBuffer.subarray(1)]
+        } while (buffer.length > pos && (buffer.readUint8(pos) != 0 || compression ))
+        return [new LabelSequence(parts), pos + 1]
     }
 
-    static parsePart(buffer: Buffer): [string, Buffer]{
-        let length = buffer.readUint8(0);
-        return [buffer.subarray(1, 1 + length).toString(), buffer.subarray(1 + length)]
+    static parsePart(buffer: Buffer, offset: number): [string, number]{
+        let length = buffer.readUint8(offset);
+        return [buffer.subarray(offset + 1, offset + 1 + length).toString(), offset + length + 1]
 
     }
 }

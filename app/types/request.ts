@@ -21,10 +21,11 @@ export class DnsRequest{
 
 
         let curLabels: LabelSequence[] = []
+        let pos = 12
         for (let i = 0; i < header.questionCount; i++){
-            let result = LabelSequence.from(curBuffer)
+            let result = LabelSequence.from(buffer, pos)
             curLabels.push(result[0])
-            curBuffer = result[1]
+            pos = result[1]
         }
 
         return new DnsRequest(header, curLabels);
