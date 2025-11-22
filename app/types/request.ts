@@ -25,7 +25,7 @@ export class DnsRequest{
         for (let i = 0; i < header.questionCount; i++){
             let result = LabelSequence.from(buffer, pos)
             curLabels.push(result[0])
-            pos = result[1]
+            pos = result[1] + 4
         }
 
         return new DnsRequest(header, curLabels);
